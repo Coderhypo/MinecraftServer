@@ -1,0 +1,91 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mc-server
+  namespace: default
+  labels:
+    app: mc-server
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: ms-server
+    spec:
+      containers:
+        - name: app-2048
+          image: daocloud.io/w0v0w/minecraft-server:1-13-2
+          ports:
+            - name: game
+              containerPort: 25565
+          volumeMounts:
+          - mountPath: /mc_server/world
+            name: world-data
+      volumes:
+        - name: world-data
+          hostPath:
+            path: /root/mc_server/world
+            type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+data:
+  server.properties: |
+    view-distance=10
+    max-build-height=256
+    server-ip=
+    level-seed=
+    gamemode=0
+    server-port=25565
+    enable-command-block=false
+    allow-nether=true
+    enable-rcon=false
+    op-permission-level=4
+    enable-query=false
+    prevent-proxy-connections=false
+    generator-settings=
+    resource-pack=
+    player-idle-timeout=0
+    level-name=world
+    motd=A Minecraft Server
+    force-gamemode=false
+    hardcore=false
+    white-list=false
+    pvp=true
+    spawn-npcs=true
+    generate-structures=true
+    spawn-animals=true
+    snooper-enabled=true
+    difficulty=1
+    network-compression-threshold=256
+    level-type=DEFAULT
+    spawn-monsters=true
+    max-tick-time=60000
+    max-players=20
+    enforce-whitelist=false
+    resource-pack-sha1=
+    online-mode=false
+    allow-flight=false
+    max-world-size=29999984
+metadata:
+  name: game-config
+  namespace: default
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mc-server
+  namespace: default
+spec:
+  selector:
+    app: mc-server
+  ports:
+  - protocol: TCP
+    port: 25565
+    targetPort: 25565
+    nodePort: 31006
+  type: NodePort
