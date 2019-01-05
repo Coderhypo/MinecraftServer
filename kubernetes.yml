@@ -10,10 +10,10 @@ spec:
   template:
     metadata:
       labels:
-        app: ms-server
+        app: mc-server
     spec:
       containers:
-        - name: app-2048
+        - name: mc-server
           image: daocloud.io/w0v0w/minecraft-server:1-13-2
           ports:
             - name: game
